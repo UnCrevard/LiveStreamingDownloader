@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+	"target": "esnext",
+	"module": "commonjs",
+	"strict": false,
+	"noImplicitThis":true,
+	"removeComments":true,
+	"noEmit":false
+	//,"allowSyntheticDefaultImports": true
+	,"esModuleInterop": true
+	},
+	"exclude":["app","scripts"]
+}

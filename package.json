@@ -1,0 +1,33 @@
+{
+  "name": "LiveStreamingDownloader",
+  "productName": "LiveStreamingDownloader",
+  "version": "0.0.0",
+  "description": "",
+  "main": "app/js/main.js",
+  "scripts": {
+    "start": "electron ./app/js/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/electron": "^1.6.10",
+    "@types/hls.js": "^0.10.2",
+    "@types/node": "^10.3.5",
+    "browserify": "^16.2.3",
+    "browserify-replace": "^0.9.3",
+    "electron": "^2.0.11",
+    "envify": "^4.1.0",
+    "tsify": "^4.0.0",
+    "typescript": "^2.9.2",
+    "uglify-es": "^3.3.9"
+  },
+  "dependencies": {
+    "hls.js": "^0.10.1",
+    "vue": "^2.5.16"
+  },
+  "browser": {
+    "vue": "vue/dist/vue.common.js",
+    "hls.js": "hls.js/dist/hls.light.min.js"
+  }
+}

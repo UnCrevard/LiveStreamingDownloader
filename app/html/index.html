@@ -1,0 +1,156 @@
+<html>
+	<head>
+		<!--
+		script-src 'self' 'unsafe-eval' 'unsafe-inline';
+		object-src 'self' https://
+		filesystem:
+		blob:
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self';">
+		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' filesystem:;">
+		-->
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="../css/uikit.css" />
+		<link rel="stylesheet" href="../css/custom.css" />
+		<link rel="stylesheet" href="../css/ionicons.css" />
+	</head>
+	<body>
+		<div v-cloak id="app" class="grid">
+
+			<!-- videos -->
+
+			<div id="videos" class="videos noSelect">
+				<div v-for="(hls,key) in videos" class="video" :id=key @click=clickOnVideos($event,hls,key)>
+					<video ref="video" autoplay></video>
+					<div class="uk-overlay-primary uk-width-small uk-padding-xsmall uk-position-bottom-center">{{hls.broadcast.username||hls.broadcast.nickname}}</div>
+					<img class="uk-overlay-primary uk-padding-xsmall uk-position-top-left icon"
+						:src="'../images/'+hls.broadcast.service+'.png'" >
+					<img id="close" class="icon hover uk-position-top-right" src="../images/close.png">
+					<img id="fullscreen" class="icon hover uk-position-center" src="../images/fullscreen.png">
+					<img id="record" class="icon hover uk-position-bottom-left" src="../images/record.png">
+				</div>
+			</div>
+			<!-- debug -->
+
+			<div v-if=memory>peak : {{memory.peakWorkingSetSize}}/{{memory.workingSetSize}} private : {{memory.privateBytes}} shared : {{memory.sharedBytes}}</div>
+
+			<!-- tabs -->
+
+			<ul class="uk-tab uk-background-muted uk-margin-small-bottom noSelect">
+				<li class="uk-width-expand" :class=currentTab==0?"uk-active":"" @click="currentTab=0"><a>broadcasts</a></li>
+				<li class="uk-width-expand" :class=currentTab==1?"uk-active":"" @click="currentTab=1"><a>{{"Recordings "+Object.keys(recordings).length}}</a></li>
+				<li class="uk-width-expand" :class=currentTab==2?"uk-active":"" @click="currentTab=2"><a>Settings</a></li>
+				<li class="uk-width-expand" :class=currentTab==3?"uk-active":"" @click="currentTab=3"><a>Help</a></li>
+				<li class="uk-width-expand" :class=currentTab==4?"uk-active":"" @click="currentTab=4"><a>About</a></li>
+			</ul>
+			<!-- thumbnails -->
+			<div class="uk-text-center noSelect" v-show="currentTab==0">
+				<div><input type="checkbox" data-info="Enable or disable auto refresh"
+					class="uk-checkbox uk-margin-small-right tooltip"
+					v-model="settings.isAutoRefresh"
+					@click="settings.isAutoRefresh=!settings.isAutoRefresh"><button
+					class="uk-margin-small-top uk-margin-small-bottom uk-button uk-button-primary"
+					@click=refresh>Refresh{{counter?" "+(settings.refreshTimeout-counter):""}}</button></div>
+				<ul class="thumbnails uk-text-small">
+					<li v-for="(key,idx) of indexBroadcasts" class="thumbnail" :id=idx @click=clickOnThumbnail>
+						<img class="uk-margin-auto cover" :src="broadcasts[key].thumbnail" onerror="this.src='../images/error.png'">
+						<div class="uk-overlay-primary uk-width-small uk-padding-xsmall uk-position-bottom-center">{{broadcasts[key].username||broadcasts[key].nickname}}</div>
+						<div class="uk-overlay-primary uk-padding-xsmall uk-position-top-center">{{broadcasts[key].viewers}}</div>
+						<img class="uk-overlay-primary uk-padding-xsmall uk-position-top-left icon" :src="'../images/'+broadcasts[key].service+'.png'">
+						<div class="overlay tooltip" :data-info="broadcasts[key].title"></div>
+						<img id="add" class="icon hover uk-position-top-right" src="../images/add.png">
+						<img id="block" class="icon hover uk-position-bottom-right" src="../images/del.png">
+						<img id="record" class="icon hover uk-position-center" src="../images/record.png">
+						<img id="play" class="icon hover uk-position-bottom-left" src="../images/play.png">
+					</li>
+				</ul>
+			</div>
+			<!-- recordings tab -->
+			<div v-show="currentTab==1" id="recordings" class="uk-text-center" >
+				<div class="uk-text-center">
+					<input class="uk-input uk-form-width-large"
+					v-model="directDownload"
+					placeholder="paste to download any supported url"
+					@change="downloadURL()">
+				</div>
+				<ul class="recordings uk-text-small uk-margin-small">
+					<li class="recording" v-for="(recording,key) in recordings">
+						<img :src="recording.thumbnail">
+						<div class="uk-overlay uk-overlay-primary uk-width-small uk-padding-xsmall uk-position-bottom-center">{{recording.username||recording.nickname}}</div>
+						<img class="uk-overlay uk-overlay-primary uk-padding-xsmall uk-position-top-left icon" :src="'../images/'+recording.service+'.png'">
+						<img id="add" class="icon hover uk-position-top-right" src="../images/add.png">
+						<img id="block" class="icon hover uk-position-bottom-right" src="../images/del.png">
+					</li>
+				</ul>
+			</div>
+			<!-- settings tab -->
+			<div id="settings" v-show="currentTab==2">
+				<div v-for="(url,idx) of settings.searchUrls">
+					<input class="uk-input uk-form-width-large"
+					v-model.lazy="settings.searchUrls[idx]"
+					placeholder="a supported url" @change=checkUrl(idx)>
+					<button class="uk-button uk-button-small uk-padding-width-small uk-button-danger" @click=delUrl(idx)>DEL</button>
+				</div>
+				<button @click=addUrl class="uk-button uk-button-primary">ADD</button>
+				<div><input class="uk-input uk-form-width-large"
+					v-model.lazy="settings.filenameTemplate"
+					placeholder="..." @change="updateFilenameTemplate"></div>
+				<div><input class="uk-input uk-form-width-large"
+					v-model.lazy="settings.pathDownload" placeholder="..." @change="updatePathDownload"></div>
+				<div>
+					<div>
+						<label class="uk-label">Ignored : {{Object.keys(ignoredUsers).length}}</label>
+						<label class="uk-label">Recording : {{Object.keys(recordings).length}}</label>
+					</div>
+				</div>
+				<div>
+					<label class="uk-label">Timer</label><input class="uk-input uk-form-width-small" type="number"
+					v-model.lazy="settings.refreshTimeout">
+				</div>
+			</div>
+			<!-- help tab -->
+			<div id="help" v-show="currentTab==3">
+				<ul class="uk-table">
+				<li v-for="user in users">{{user.username||user.nickname}} {{user.status||user.title}}</li>
+			</ul>
+			</div>
+			<!-- about tab -->
+			<div id="about" v-show="currentTab==4">
+			</div>
+			<!-- alert popup -->
+			<div v-show="alert" id="alert" class="alert" class="uk-animation-fade" :class="alert && alert.class">{{alert && alert.message}}</div>
+			<!-- popup informations -->
+			<div v-if="infos" id="infos">
+				<div class="uk-position-fixed uk-border-rounded uk-card uk-card-default uk-width-large uk-position-top-center">
+					<div class="uk-flex uk-card-header">
+						<div>
+							<img class="uk-border-rounded" width="64" height="64" :src=infos.profilePicture>
+						</div>
+						<div class="uk-width-expand uk-margin-left">
+							<h3 class="uk-card-title uk-margin-remove-bottom">{{infos.username||infos.nickname}}</h3>
+							<div class="uk-text-meta uk-margin-remove-top">{{infos.title}}</div>
+						</div>
+					</div>
+					<div class="uk-card-body">
+						<ul class="uk-list uk-list-striped" v-for="value,key in infos">
+							<li>{{key}} : {{value}}</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<!-- link donation 14bpqrNgreKaFtLaK85ArtcUKyAxuKpwJM -->
+			<div class="uk-text-center">
+			<a id="donation" class="noMargin sticky uk-alert-primary uk-animation-shake center uk-text-center uk-width-large" @click="openDonationLink()">
+				<span class="uk-text-danger">Please donate</span><img class="center uk-margin-top" src="../images/bitcoin.png">
+			</a>
+		</div>
+			<!--
+			<div>
+				<a class="github" href="https://github.com/UnCrevard" target="_blank"><i class="ion-social-github"></i></a>
+				<a class="store" href="https://addons.mozilla.org/firefox/addon/freeleech/" target="_blank"><i class="ion-home"></i></a>
+			</div>
+			-->
+		</div>
+	</div>
+	<script src="../js/app.js"></script>
+</body>
+</html>

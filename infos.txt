@@ -1,0 +1,3 @@
+hls.js : unstable.
+
+npx electron-packager app --overwrite --icon app\images\app.ico --out %temp%
