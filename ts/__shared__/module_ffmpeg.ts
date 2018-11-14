@@ -4,15 +4,23 @@ import * as _cp from "child_process"
 
 import {log,error,debug} from "../__shared__/module_log"
 
-export function ffmpeg(inpfile:string,outfile:string,options:string):Promise<boolean>
+
+// unuseable right now
+
+/*
+
+export function ffmpeg(inpfile:string,
+	outfile:string,
+	options:string,
+	ffmpegPath:string):Promise<boolean>
 {
 	return new Promise((resolve,reject)=>
 	{
 		let args=["-i",inpfile,...options.split(" "),outfile]
 
-		let ffmpeg=_cp.spawn("ffmpeg",args)
+		debug("ffmpeg",args)
 
-		ffmpeg.stderr.pipe(process.stdout)
+		let ffmpeg=_cp.spawn(ffmpegPath||"ffmpeg",args)		
 
 		// fatal (ffmpeg is missing/bad options)
 
@@ -26,5 +34,9 @@ export function ffmpeg(inpfile:string,outfile:string,options:string):Promise<boo
 		{
 			resolve(code==0)
 		})
+
+		ffmpeg.stderr.pipe(process.stdout)
 	})
 }
+
+*/

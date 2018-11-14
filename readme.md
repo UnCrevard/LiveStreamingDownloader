@@ -1,5 +1,12 @@
 # LiveStreamDownloader
 
+![screenshot]("LiveStreamDownloader.png")
+
+## change log 0.2 (quick patch) :
+
+	+ fix ffmpeg path for younow.
+	+ multipart download is disabled for now cuz fetch api sux and I need to find another way to retrieve all headers (only a problem for youtube & vk replays)
+
 ## Features :
 
 	+only need a mouse. no cli
@@ -60,7 +67,7 @@
 
 	https://www.younow.com/username
 
-version 0.0.0:
+version 0.0:
 
 ## Bugs :
 

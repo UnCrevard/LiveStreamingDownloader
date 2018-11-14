@@ -18,9 +18,6 @@ import Player from "hls.js"
 import * as _younow from "./module_lsd_younow"
 import * as _periscope from "./module_lsd_periscope"
 
-import {ffmpeg} from "./__shared__/module_ffmpeg"
-
-
 export async function unitTesting(args: Array<string>) {
 
 	log(args)

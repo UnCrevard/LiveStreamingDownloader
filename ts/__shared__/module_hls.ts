@@ -6,7 +6,6 @@ import * as _path from "path"
 import { getJSON, getText, getBinary } from "./module_net"
 import { log, debug, error } from "./module_log"
 import { noop, promisify } from "./module_utils"
-import { ffmpeg } from "./module_ffmpeg"
 import * as P from "./module_fs"
 
 let currentConnections = 0
@@ -88,27 +87,6 @@ function parsePlaylist(playlist: string, head: string, tail: string): { endlist:
 	if (segments.length == 0) throw "playlist invalid"
 
 	return { endlist: endlist, urls: segments }
-}
-
-/*
-
-	ffmpeg version
-
-	+ez coding
-	-no parallelism
-	-no rewind
-	-buggy
-	-no retry
-
-*/
-export class HlsWithFFMPEG {
-	constructor(timeout: number, maxParallel: number) {
-
-	}
-
-	play(url: string, outfile: string): Promise<boolean> {
-		return ffmpeg(url, outfile, "-loglevel error -c copy -y")
-	}
 }
 
 /*

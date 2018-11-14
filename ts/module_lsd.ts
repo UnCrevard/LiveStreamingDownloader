@@ -13,12 +13,12 @@ export function createFilename(infos: FilenameInformations,pathDownload: string)
 	let filename=cleanFilename(global.vue.settings.filenameTemplate
 		.replace("service",infos.service.capitalizeFirstLetter())
 		.replace("country",infos.country||infos.language||"XX"))
-		.replace("username",infos.username)
+		.replace("username",infos.username||"missing")
 		.replace("date",formatDateTime(infos.date||new Date()))
-		.replace("title",infos.title)
-		.replace("type",infos.type)
-		.replace("bid",infos.broadcastId as any)
-		.replace("uid",infos.userId as any)
+		.replace("title",infos.title||"missing")
+		.replace("type",infos.type||"missing")
+		.replace("bid",infos.broadcastId as any||"missing")
+		.replace("uid",infos.userId as any||"missing")
 
 	return _path.join(pathDownload,filename)
 }

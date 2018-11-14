@@ -1,7 +1,7 @@
 {
-  "name": "LiveStreamingDownloader",
+  "name": "lsd",
   "productName": "LiveStreamingDownloader",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "app/js/main.js",
   "scripts": {

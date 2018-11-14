@@ -56,6 +56,11 @@ export async function downloadMultipart(url: string, filename: string, maxParall
 
 	if (!url || !filename) throw "downloadMultipart bad params";
 
+	if (!maxParallelDownload)
+	{
+		debug(global.system)
+	}
+
 
 	debug(url, filename)
 
@@ -89,7 +94,19 @@ export async function downloadMultipart(url: string, filename: string, maxParall
 
 	if (!res.ok) throw res.status
 
-	if (res.headers.has("accept-ranges")) {
+	/*
+
+	@todo : this can't work on electron cuz some fetch bullshit limitation can't get all headers !!!
+
+	blablabla https://www.w3.org/TR/cors/#terminology
+
+	fuck it !!! that's piss me off. it works on nodejs.
+
+	so multipart download is disabled for now. I'll use electron net api for this (probably some crappy stuff too)
+
+	*/
+
+	if (res.headers.has("Accept-Ranges")) {
 
 		let len: number
 
@@ -108,12 +125,12 @@ export async function downloadMultipart(url: string, filename: string, maxParall
 
 		let start = 0
 
-		debug(`multipart started size ${len} blocks ${block}*${total}`)
+		debug(`multipart started size ${len} blocks ${block}*${total} parallel ${maxParallelDownload}`)
 
 		let startTime=Date.now()
 
 		while (total) {
-			let max = Math.min(total, maxParallelDownload)
+			let max = Math.min(total, maxParallelDownload) || 1
 
 			let requests: Array<Promise<Buffer>> = []
 
@@ -173,8 +190,11 @@ export async function downloadMultipart(url: string, filename: string, maxParall
 		debug(`multipart finished ${len/(Date.now()-startTime+1) | 0} kb/s`)
 	}
 	else {
+
 		//@todo : memory problem. better API on electron ?
+		
 		error("range not available",url)
+
 		return downloadSingle(url, filename)
 	}
 }

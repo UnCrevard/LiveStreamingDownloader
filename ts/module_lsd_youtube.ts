@@ -91,7 +91,7 @@ export async function downloadBroadcast(infos:Youtube.VideoInfos){
 		try {
 			// 133,134,135,136,137,140,160,171,242,243,244,247,248,249,250,251,271,278,313
 
-			await _youtube.downloadDash(infos, basename, [138, 137, 136, 135, 134, 133, 160], "app/bin/ffmpeg")
+			await _youtube.downloadDash(infos, basename, [138, 137, 136, 135, 134, 133, 160], "bin/ffmpeg")
 		}
 		catch (err) {
 

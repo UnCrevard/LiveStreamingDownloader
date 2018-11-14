@@ -3,6 +3,7 @@
 import { getJSON, getText, getBinary } from "./module_net"
 import { downloadMultipart } from "./module_download"
 import { prettify, noop, jsonDeepSearch, promisify } from "./module_utils"
+import {spawn} from "child_process"
 import * as querystring from "querystring"
 import { log, debug, warn, error } from "./module_log"
 import * as P from "./module_fs"
@@ -11,7 +12,6 @@ import * as _fs from "fs"
 import * as _url from "url"
 import * as _os from "os"
 import * as _path from "path"
-import { spawn } from "child_process"
 
 // @todo : keep up to date
 
